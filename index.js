@@ -1,6 +1,7 @@
 const fs = require("fs");
 const util = require("util");
 const inquirer = require('inquirer');
+const markDown = require('./utils/generateMarkdown');
 
 const writeFileAsync = util.promisify(fs.writeFile);
 
@@ -40,7 +41,7 @@ const questions = [
         name: "license",
         type: "list",
         message: "Choose a license type",
-        choices: ["Community License", "MIT License", "GNU GPL"],
+        choices: ["Community", "MIT", "GNU GPLv3"],
     },
     {
         name: "gitHubUserName",
@@ -57,43 +58,7 @@ const questions = [
 
 // function to write README file
 async function writeToFile(fileName, data) {
-    let readMeTemplate = `# ${data.title}
-    
-## Desription
-        
-${data.description}
-
-## Table of Contents
-
-* [Description](#description)
-* [Installation](#installation)
-* [Usage](#usage)
-* [License](#license)
-* [Contributing](#contributing)
-* [Tests](#tests)
-* [Questions](#questions)
-
-## Installation
-${data.installation}
-
-## Usage
-${data.usage}
-
-## License
-${data.license}
-
-## Contributing
-${data.contributors}
-
-## Tests
-${data.tests}
-
-## Questions
-
-For more information:
-Visit: [https://${data.gitHubUserName}.github.io](https://${data.gitHubUserName}.github.io)
-Email: ${data.email}
-`;
+    const readMeTemplate = markDown.generateMarkdown(data);
 
     try {
         await writeFileAsync(fileName, readMeTemplate);
@@ -108,8 +73,8 @@ async function init() {
     try {
         const answers = await inquirer.prompt(questions);
 
-        writeToFile("test.md", answers)
-        console.log(answers);
+        writeToFile("readme.md", answers)
+        // console.log(answers);
     } catch (error) {
         throw Error(error);
     }
